@@ -94,15 +94,6 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.inspector)
         self.layout.setStretch(0, 2)
         self.layout.setStretch(1, 1)
-        
-
-    def show_help_window(self):
-        """
-        Shows the help window when the
-        help QAction is clicked.
-        """
-        self.help_window = HelpWindow()
-        self.help_window.show()
 
     def add(self):
         item = self.bucket.add_item(f"New item")
@@ -116,6 +107,14 @@ class MainWindow(QMainWindow):
 
     def cut(self):
         self.listWidget.takeItem(self.listWidget.currentRow())
+
+    def show_help_window(self):
+        """
+        Shows the help window when the
+        help QAction is clicked.
+        """
+        self.help_window = HelpWindow()
+        self.help_window.show()
 
     def item_clicked(self):
         # Prints index of selected item
