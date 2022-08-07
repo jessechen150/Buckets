@@ -1,10 +1,9 @@
-from src.item import Item
+from src.bucketList import *
 
-i = Item("Hello")
+b = BucketList("Countries To Visit")
+b.add_item("Bulgaria")
+b.add_item("China")
+b.add_item("Iceland")
 
-print(i.title)
-print(i.description)
-print(i.last_modified)
-
-i.set_description("This is my description")
-print(i.description)
+for i in b.items:
+    print(i.title)
