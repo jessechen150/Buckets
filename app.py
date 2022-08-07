@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from src.help import HelpWindow
-
+from src.bucketList import *
 
 
 class MainWindow(QMainWindow):
@@ -16,10 +16,14 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Buckets")
         self.setWindowIcon(QIcon("icons/list.png"))
-        self.resize(QSize(800, 500))
+        self.resize(QSize(900, 500))
+
+        # Setup bucket list
+        self.bucket = BucketList("My Bucket List")
 
         # Setup widgets
         self.setup_toolbar()
+        self.setup_tabs()
 
     def setup_toolbar(self):
         """
@@ -62,9 +66,6 @@ class MainWindow(QMainWindow):
         toolbar.addAction(help_button)
         toolbar.setMovable(False)
 
-    def save(self):
-        print("Save")
-
     def add(self):
         print("Add")
 
@@ -85,7 +86,28 @@ class MainWindow(QMainWindow):
         self.help_window = HelpWindow()
         self.help_window.show()
 
+    def setup_tabs(self):
+        tabs = QTabWidget()
+        layout = QHBoxLayout()
+        layout.addWidget(Color('red'))
+        layout.addWidget(Color('green'))
+        layout.setStretch(0, 2)
+        layout.setStretch(1, 1)
 
+        widget = QWidget()
+        widget.setLayout(layout)
+        tabs.addTab(widget, QIcon(""), self.bucket.title)
+        self.setCentralWidget(tabs)
+
+class Color(QWidget):
+
+    def __init__(self, color):
+        super(Color, self).__init__()
+        self.setAutoFillBackground(True)
+
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(color))
+        self.setPalette(palette)
 
 app = QApplication([])
 window = MainWindow()
