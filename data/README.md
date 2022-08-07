@@ -1,0 +1,1 @@
+When you run the script, your bucket list files will be stored here.
