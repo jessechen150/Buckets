@@ -4,6 +4,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from src.helpWindow import HelpWindow
 from src.bucketList import *
+from src.color import *
 
 
 class MainWindow(QMainWindow):
@@ -20,8 +21,12 @@ class MainWindow(QMainWindow):
 
         # Setup bucket list
         self.bucket = BucketList("My Bucket List")
+        self.selected_bucket = None
+        self.selected_item = None
 
         # Setup widgets
+        self.listWidget = QListWidget()
+        self.listWidget.clicked.connect(self.item_clicked)
         self.setup_toolbar()
         self.setup_tabs()
 
@@ -66,9 +71,31 @@ class MainWindow(QMainWindow):
         toolbar.addAction(help_button)
         toolbar.setMovable(False)
 
+    def setup_tabs(self):
+        tabs = QTabWidget()
+        layout = QHBoxLayout()
+
+        layout.addWidget(self.listWidget)
+        layout.addWidget(Color('green'))
+        layout.setStretch(0, 2)
+        layout.setStretch(1, 1)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        tabs.addTab(widget, QIcon(""), self.bucket.title)
+        self.setCentralWidget(tabs)
+
+    def show_help_window(self):
+        """
+        Shows the help window when the
+        help QAction is clicked.
+        """
+        self.help_window = HelpWindow()
+        self.help_window.show()
+
     def add(self):
-        print("Add")
-        self.test.addItem("hello")
+        item = self.bucket.add_item("New item")
+        self.listWidget.addItem(item.title)
 
     def undo(self):
         print("Undo")
@@ -79,39 +106,10 @@ class MainWindow(QMainWindow):
     def cut(self):
         print("Cut")
 
-    def show_help_window(self):
-        """
-        Shows the help window when the
-        help QAction is clicked.
-        """
-        self.help_window = HelpWindow()
-        self.help_window.show()
+    def item_clicked(self):
+        # Prints index of selected item
+        self.selected_item = self.listWidget.currentRow()
 
-    def setup_tabs(self):
-        tabs = QTabWidget()
-        layout = QHBoxLayout()
-
-        self.test = QListWidget()
-
-        layout.addWidget(self.test)
-        layout.addWidget(Color('green'))
-        layout.setStretch(0, 2)
-        layout.setStretch(1, 1)
-
-        widget = QWidget()
-        widget.setLayout(layout)
-        tabs.addTab(widget, QIcon(""), self.bucket.title)
-        self.setCentralWidget(tabs)
-
-class Color(QWidget):
-
-    def __init__(self, color):
-        super(Color, self).__init__()
-        self.setAutoFillBackground(True)
-
-        palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(color))
-        self.setPalette(palette)
 
 app = QApplication([])
 window = MainWindow()

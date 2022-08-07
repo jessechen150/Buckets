@@ -13,6 +13,13 @@ class Item:
         self.status = 0
         self.description = None
 
+    def set_title(self, title):
+        if len(title) > 100:
+            self.title = title[:100]
+        else:
+            self.title = title
+        self.last_modified = datetime.now().strftime(self.date_format)
+
     def set_description(self, desc):
         if len(desc) > 1000:
             self.description = desc[:1000]
@@ -43,6 +50,7 @@ class BucketList:
     def add_item(self, title):
         item = Item(title)
         self.items.append(item)
+        return item
 
     def remove_item(self, item):
         self.items.remove(item)
