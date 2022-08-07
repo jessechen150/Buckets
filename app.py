@@ -21,14 +21,21 @@ class MainWindow(QMainWindow):
 
         # Setup bucket list
         self.bucket = BucketList("My Bucket List")
-        self.selected_bucket = None
-        self.selected_item = None
 
         # Setup widgets
-        self.listWidget = QListWidget()
-        self.listWidget.clicked.connect(self.item_clicked)
+        self.setup_lists()
         self.setup_toolbar()
         self.setup_tabs()
+        self.setup_inspector()
+        self.setup_layout()
+
+        self.MainWidget = QWidget()
+        self.MainWidget.setLayout(self.layout)
+        self.setCentralWidget(self.MainWidget)
+
+    def setup_lists(self):
+        self.listWidget = QListWidget()
+        self.listWidget.clicked.connect(self.item_clicked)
 
     def setup_toolbar(self):
         """
@@ -72,18 +79,22 @@ class MainWindow(QMainWindow):
         toolbar.setMovable(False)
 
     def setup_tabs(self):
-        tabs = QTabWidget()
-        layout = QHBoxLayout()
+        self.tabs = QTabWidget()
+        self.tabs.addTab(self.listWidget, QIcon(""), self.bucket.title)
 
-        layout.addWidget(self.listWidget)
-        layout.addWidget(Color('green'))
-        layout.setStretch(0, 2)
-        layout.setStretch(1, 1)
+    def setup_inspector(self):
+        self.inspector = QGroupBox("Inspector")
+        self.inspector_layout = QFormLayout()
+        self.inspector_layout.addRow("Test:", QLineEdit())
+        self.inspector.setLayout(self.inspector_layout)
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        tabs.addTab(widget, QIcon(""), self.bucket.title)
-        self.setCentralWidget(tabs)
+    def setup_layout(self):
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.tabs)
+        self.layout.addWidget(self.inspector)
+        self.layout.setStretch(0, 2)
+        self.layout.setStretch(1, 1)
+        
 
     def show_help_window(self):
         """
@@ -94,7 +105,7 @@ class MainWindow(QMainWindow):
         self.help_window.show()
 
     def add(self):
-        item = self.bucket.add_item("New item")
+        item = self.bucket.add_item(f"New item")
         self.listWidget.addItem(item.title)
 
     def undo(self):
@@ -104,11 +115,12 @@ class MainWindow(QMainWindow):
         print("Redo")
 
     def cut(self):
-        print("Cut")
+        self.listWidget.takeItem(self.listWidget.currentRow())
 
     def item_clicked(self):
         # Prints index of selected item
-        self.selected_item = self.listWidget.currentRow()
+        # self.listWidget.currentRow()
+        print("Item clicked")
 
 
 app = QApplication([])

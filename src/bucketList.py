@@ -52,5 +52,5 @@ class BucketList:
         self.items.append(item)
         return item
 
-    def remove_item(self, item):
-        self.items.remove(item)
+    def remove_index(self, index):
+        self.items.pop(index)
