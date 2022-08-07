@@ -2,7 +2,7 @@ import os
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
-from src.help import HelpWindow
+from src.helpWindow import HelpWindow
 from src.bucketList import *
 
 
@@ -68,6 +68,7 @@ class MainWindow(QMainWindow):
 
     def add(self):
         print("Add")
+        self.test.addItem("hello")
 
     def undo(self):
         print("Undo")
@@ -89,7 +90,10 @@ class MainWindow(QMainWindow):
     def setup_tabs(self):
         tabs = QTabWidget()
         layout = QHBoxLayout()
-        layout.addWidget(Color('red'))
+
+        self.test = QListWidget()
+
+        layout.addWidget(self.test)
         layout.addWidget(Color('green'))
         layout.setStretch(0, 2)
         layout.setStretch(1, 1)
