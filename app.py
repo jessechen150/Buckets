@@ -85,7 +85,6 @@ class MainWindow(QMainWindow):
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
         self.titleEdit.setEnabled(False)
-        self.titleEdit.editingFinished.connect(self.title_edited)
 
         self.descriptionEdit = QTextEdit()
         self.descriptionEdit.setEnabled(False)
@@ -97,12 +96,21 @@ class MainWindow(QMainWindow):
 
         self.lastModified = QLabel("")
 
+        self.save_button = QPushButton("Save")
+        self.save_button.clicked.connect(self.inspector_save)
+
         self.inspector = QGroupBox("Inspector")
-        self.inspector_layout = QFormLayout()
-        self.inspector_layout.addRow("Title:", self.titleEdit)
-        self.inspector_layout.addRow("Description:", self.descriptionEdit)
-        self.inspector_layout.addRow("Status:", self.itemStatus)
-        self.inspector_layout.addRow("Last Modified:", self.lastModified)
+        self.inspector_layout = QVBoxLayout()
+        self.inspector_form = QWidget()
+        self.inspector_form_layout = QFormLayout()
+        self.inspector_form_layout.addRow("Title:", self.titleEdit)
+        self.inspector_form_layout.addRow("Description:", self.descriptionEdit)
+        self.inspector_form_layout.addRow("Status:", self.itemStatus)
+        self.inspector_form_layout.addRow("Last Modified:", self.lastModified)
+        self.inspector_form.setLayout(self.inspector_form_layout)
+
+        self.inspector_layout.addWidget(self.inspector_form)
+        self.inspector_layout.addWidget(self.save_button)
         self.inspector.setLayout(self.inspector_layout)
 
     def setup_layout(self):
@@ -132,6 +140,7 @@ class MainWindow(QMainWindow):
             self.titleEdit.setEnabled(False)
             self.descriptionEdit.clear()
             self.descriptionEdit.setEnabled(False)
+            self.itemStatus.clear()
             self.itemStatus.setEnabled(False)
             self.lastModified.setText("")
 
@@ -148,12 +157,21 @@ class MainWindow(QMainWindow):
         self.descriptionEdit.setEnabled(True)
         self.descriptionEdit.setText(self.bucket.items[i].description)
         self.itemStatus.setEnabled(True)
+        self.itemStatus.clear()
+        self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
+        self.itemStatus.setCurrentIndex(self.bucket.items[i].status)
         self.lastModified.setText(self.bucket.items[i].last_modified)
 
-    def title_edited(self):
+    def inspector_save(self):
         i = self.listWidget.currentRow()
+        
         self.bucket.items[i].set_title(self.titleEdit.text())
         self.listWidget.currentItem().setText(self.titleEdit.text())
+        self.bucket.items[i].set_description(self.descriptionEdit.toPlainText())
+        self.bucket.items[i].set_status(self.itemStatus.currentIndex())
+
+        self.lastModified.setText(self.bucket.items[i].last_modified)
+        
         
 
 
