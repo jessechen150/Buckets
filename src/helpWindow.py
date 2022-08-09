@@ -7,4 +7,4 @@ class HelpWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Help")
         self.setWindowIcon(QIcon("icons/question.png"))
-        self.resize(QSize(450, 250))
+        self.resize(QSize(500, 250))

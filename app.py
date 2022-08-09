@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Buckets")
         self.setWindowIcon(QIcon("icons/list.png"))
-        self.resize(QSize(900, 500))
+        self.resize(QSize(1000, 500))
 
         # Setup bucket list
         self.bucket = BucketList("My Bucket List")
@@ -83,9 +83,22 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.listWidget, QIcon(""), self.bucket.title)
 
     def setup_inspector(self):
+        self.titleEdit = QLineEdit()
+        self.titleEdit.setEnabled(False)
+        self.descriptionEdit = QTextEdit()
+        self.descriptionEdit.setEnabled(False)
+        self.lastModified = QLabel("")
+        self.itemStatus = QComboBox()
+        self.itemStatus.setPlaceholderText(" ")
+        self.itemStatus.setEnabled(False)
+        self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
+
         self.inspector = QGroupBox("Inspector")
         self.inspector_layout = QFormLayout()
-        self.inspector_layout.addRow("Test:", QLineEdit())
+        self.inspector_layout.addRow("Title:", self.titleEdit)
+        self.inspector_layout.addRow("Description:", self.descriptionEdit)
+        self.inspector_layout.addRow("Status:", self.itemStatus)
+        self.inspector_layout.addRow("Last Modified:", self.lastModified)
         self.inspector.setLayout(self.inspector_layout)
 
     def setup_layout(self):
@@ -106,7 +119,10 @@ class MainWindow(QMainWindow):
         print("Redo")
 
     def cut(self):
-        self.listWidget.takeItem(self.listWidget.currentRow())
+        if self.listWidget.currentRow() >= 0:
+            self.bucket.remove_index(self.listWidget.currentRow())
+            self.listWidget.takeItem(self.listWidget.currentRow())
+        print(len(self.bucket.items))
 
     def show_help_window(self):
         """
