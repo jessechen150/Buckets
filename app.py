@@ -21,7 +21,6 @@ class MainWindow(QMainWindow):
 
         # Setup bucket list
         self.bucket = BucketList("My Bucket List")
-        self.temporary_counter = 0
 
         # Setup widgets
         self.setup_lists()
@@ -86,12 +85,16 @@ class MainWindow(QMainWindow):
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
         self.titleEdit.setEnabled(False)
+        self.titleEdit.editingFinished.connect(self.title_edited)
+
         self.descriptionEdit = QTextEdit()
         self.descriptionEdit.setEnabled(False)
+        
         self.itemStatus = QComboBox()
         self.itemStatus.setPlaceholderText(" ")
         self.itemStatus.setEnabled(False)
         self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
+
         self.lastModified = QLabel("")
 
         self.inspector = QGroupBox("Inspector")
@@ -110,9 +113,8 @@ class MainWindow(QMainWindow):
         self.layout.setStretch(1, 1)
 
     def add(self):
-        item = self.bucket.add_item(f"New item {self.temporary_counter}")
+        item = self.bucket.add_item("New item")
         self.listWidget.addItem(item.title)
-        self.temporary_counter += 1
 
     def undo(self):
         print("Undo")
@@ -132,13 +134,8 @@ class MainWindow(QMainWindow):
             self.descriptionEdit.setEnabled(False)
             self.itemStatus.setEnabled(False)
             self.lastModified.setText("")
-            
 
     def show_help_window(self):
-        """
-        Shows the help window when the
-        help QAction is clicked.
-        """
         self.help_window = HelpWindow()
         self.help_window.show()
 
@@ -152,6 +149,11 @@ class MainWindow(QMainWindow):
         self.descriptionEdit.setText(self.bucket.items[i].description)
         self.itemStatus.setEnabled(True)
         self.lastModified.setText(self.bucket.items[i].last_modified)
+
+    def title_edited(self):
+        i = self.listWidget.currentRow()
+        self.bucket.items[i].set_title(self.titleEdit.text())
+        self.listWidget.currentItem().setText(self.titleEdit.text())
         
 
 
