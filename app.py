@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
 
         # Setup bucket list
         self.bucket = BucketList("My Bucket List")
+        self.temporary_counter = 0
 
         # Setup widgets
         self.setup_lists()
@@ -87,11 +88,11 @@ class MainWindow(QMainWindow):
         self.titleEdit.setEnabled(False)
         self.descriptionEdit = QTextEdit()
         self.descriptionEdit.setEnabled(False)
-        self.lastModified = QLabel("")
         self.itemStatus = QComboBox()
         self.itemStatus.setPlaceholderText(" ")
         self.itemStatus.setEnabled(False)
         self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
+        self.lastModified = QLabel("")
 
         self.inspector = QGroupBox("Inspector")
         self.inspector_layout = QFormLayout()
@@ -109,8 +110,9 @@ class MainWindow(QMainWindow):
         self.layout.setStretch(1, 1)
 
     def add(self):
-        item = self.bucket.add_item(f"New item")
+        item = self.bucket.add_item(f"New item {self.temporary_counter}")
         self.listWidget.addItem(item.title)
+        self.temporary_counter += 1
 
     def undo(self):
         print("Undo")
@@ -119,10 +121,18 @@ class MainWindow(QMainWindow):
         print("Redo")
 
     def cut(self):
-        if self.listWidget.currentRow() >= 0:
-            self.bucket.remove_index(self.listWidget.currentRow())
-            self.listWidget.takeItem(self.listWidget.currentRow())
-        print(len(self.bucket.items))
+        i = self.listWidget.currentRow()
+        if i >= 0:
+            self.bucket.remove_index(i)
+            self.listWidget.takeItem(i)
+
+            self.titleEdit.clear()
+            self.titleEdit.setEnabled(False)
+            self.descriptionEdit.clear()
+            self.descriptionEdit.setEnabled(False)
+            self.itemStatus.setEnabled(False)
+            self.lastModified.setText("")
+            
 
     def show_help_window(self):
         """
@@ -133,9 +143,16 @@ class MainWindow(QMainWindow):
         self.help_window.show()
 
     def item_clicked(self):
-        # Prints index of selected item
-        # self.listWidget.currentRow()
-        print("Item clicked")
+        i = self.listWidget.currentRow()
+        self.titleEdit.clear()
+        self.titleEdit.setEnabled(True)
+        self.titleEdit.insert(self.bucket.items[i].title)
+        self.descriptionEdit.clear()
+        self.descriptionEdit.setEnabled(True)
+        self.descriptionEdit.setText(self.bucket.items[i].description)
+        self.itemStatus.setEnabled(True)
+        self.lastModified.setText(self.bucket.items[i].last_modified)
+        
 
 
 app = QApplication([])
