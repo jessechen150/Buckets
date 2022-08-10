@@ -4,7 +4,6 @@ from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from src.helpWindow import HelpWindow
 from src.bucketList import *
-from src.color import *
 
 
 class MainWindow(QMainWindow):
@@ -20,7 +19,9 @@ class MainWindow(QMainWindow):
         self.resize(QSize(1000, 500))
 
         # Setup bucket list
-        self.bucket = BucketList("My Bucket List")
+        # self.bucket = BucketList("My Bucket List")
+        self.buckets = []
+        self.lists = []
 
         # Setup widgets
         self.setup_lists()
@@ -34,8 +35,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.MainWidget)
 
     def setup_lists(self):
-        self.listWidget = QListWidget()
-        self.listWidget.clicked.connect(self.item_clicked)
+        self.buckets.append(BucketList("New bucket list"))
+        self.lists.append(QListWidget())
+        self.lists[-1].clicked.connect(self.item_clicked)
 
     def setup_toolbar(self):
         """
@@ -90,7 +92,9 @@ class MainWindow(QMainWindow):
 
     def setup_tabs(self):
         self.tabs = QTabWidget()
-        self.tabs.addTab(self.listWidget, QIcon(""), self.bucket.title)
+        self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
+        self.tabs.currentChanged.connect(self.clear_inspector)
+        self.current_tab_index = 0
 
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
@@ -124,6 +128,15 @@ class MainWindow(QMainWindow):
         self.inspector_layout.addWidget(self.save_button)
         self.inspector.setLayout(self.inspector_layout)
 
+    def clear_inspector(self):
+        self.titleEdit.clear()
+        self.titleEdit.setEnabled(False)
+        self.descriptionEdit.clear()
+        self.descriptionEdit.setEnabled(False)
+        self.itemStatus.clear()
+        self.itemStatus.setEnabled(False)
+        self.lastModified.setText("")
+
     def setup_layout(self):
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.tabs)
@@ -132,10 +145,17 @@ class MainWindow(QMainWindow):
         self.layout.setStretch(1, 1)
 
     def add_tab(self):
-        print("Add tab")
+        self.setup_lists()
+        self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
 
     def cut_tab(self):
-        print("Cut tab")
+        i = self.tabs.currentIndex()
+        if i >= 0:
+            self.buckets.pop(i)
+            self.lists.pop(i)
+            self.tabs.removeTab(i)
+
+            self.clear_inspector()
 
     def add_item(self):
         item = self.bucket.add_item("New item")
@@ -147,13 +167,7 @@ class MainWindow(QMainWindow):
             self.bucket.remove_index(i)
             self.listWidget.takeItem(i)
 
-            self.titleEdit.clear()
-            self.titleEdit.setEnabled(False)
-            self.descriptionEdit.clear()
-            self.descriptionEdit.setEnabled(False)
-            self.itemStatus.clear()
-            self.itemStatus.setEnabled(False)
-            self.lastModified.setText("")
+            self.clear_inspector()
 
     def undo(self):
         print("Undo")
