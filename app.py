@@ -94,7 +94,6 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
         self.tabs.currentChanged.connect(self.clear_inspector)
-        self.current_tab_index = 0
 
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
@@ -158,16 +157,20 @@ class MainWindow(QMainWindow):
             self.clear_inspector()
 
     def add_item(self):
-        item = self.bucket.add_item("New item")
-        self.listWidget.addItem(item.title)
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            item = self.buckets[tab_i].add_item("New item")
+            self.lists[tab_i].addItem(item.title)
 
     def cut_item(self):
-        i = self.listWidget.currentRow()
-        if i >= 0:
-            self.bucket.remove_index(i)
-            self.listWidget.takeItem(i)
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            i = self.lists[tab_i].currentRow()
+            if i >= 0:
+                self.buckets[tab_i].remove_index(i)
+                self.lists[tab_i].takeItem(i)
 
-            self.clear_inspector()
+                self.clear_inspector()
 
     def undo(self):
         print("Undo")
@@ -180,32 +183,36 @@ class MainWindow(QMainWindow):
         self.help_window.show()
 
     def item_clicked(self):
-        i = self.listWidget.currentRow()
-        self.titleEdit.clear()
-        self.titleEdit.setEnabled(True)
-        self.titleEdit.insert(self.bucket.items[i].title)
-        self.descriptionEdit.clear()
-        self.descriptionEdit.setEnabled(True)
-        self.descriptionEdit.setText(self.bucket.items[i].description)
-        self.itemStatus.setEnabled(True)
-        self.itemStatus.clear()
-        self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
-        self.itemStatus.setCurrentIndex(self.bucket.items[i].status)
-        self.lastModified.setText(self.bucket.items[i].last_modified)
-        self.save_button.setEnabled(True)
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            i = self.lists[tab_i].currentRow()
+            self.titleEdit.clear()
+            self.titleEdit.setEnabled(True)
+            self.titleEdit.insert(self.buckets[tab_i].items[i].title)
+            self.descriptionEdit.clear()
+            self.descriptionEdit.setEnabled(True)
+            self.descriptionEdit.setText(self.buckets[tab_i].items[i].description)
+            self.itemStatus.setEnabled(True)
+            self.itemStatus.clear()
+            self.itemStatus.addItems(["Not Started", "In Progress", "Completed"])
+            self.itemStatus.setCurrentIndex(self.buckets[tab_i].items[i].status)
+            self.lastModified.setText(self.buckets[tab_i].items[i].last_modified)
+            self.save_button.setEnabled(True)
 
     def inspector_save(self):
-        i = self.listWidget.currentRow()
-        
-        if i >= 0:
-            self.bucket.items[i].set_title(self.titleEdit.text())
-            self.listWidget.currentItem().setText(self.titleEdit.text())
-            self.bucket.items[i].set_description(self.descriptionEdit.toPlainText())
-            self.bucket.items[i].set_status(self.itemStatus.currentIndex())
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            i = self.lists[tab_i].currentRow()
+            
+            if i >= 0:
+                self.buckets[tab_i].items[i].set_title(self.titleEdit.text())
+                self.lists[tab_i].currentItem().setText(self.titleEdit.text())
+                self.buckets[tab_i].items[i].set_description(self.descriptionEdit.toPlainText())
+                self.buckets[tab_i].items[i].set_status(self.itemStatus.currentIndex())
 
-            self.lastModified.setText(self.bucket.items[i].last_modified)
-        else:
-            self.save_button.setEnabled(False)
+                self.lastModified.setText(self.buckets[tab_i].items[i].last_modified)
+            else:
+                self.save_button.setEnabled(False)
         
         
 
