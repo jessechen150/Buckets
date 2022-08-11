@@ -54,3 +54,6 @@ class BucketList:
 
     def remove_index(self, index):
         self.items.pop(index)
+
+    def __len__(self):
+        return len(self.items)

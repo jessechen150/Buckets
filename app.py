@@ -56,8 +56,8 @@ class MainWindow(QMainWindow):
         cut_tab_button = QAction(QIcon("icons/cross.png"), "Remove current bucket list", self)
         add_item_button = QAction(QIcon("icons/pencil-plus.png"), "Add a new item", self)
         cut_item_button = QAction(QIcon("icons/scissors.png"), "Remove current item", self)
-        undo_button = QAction(QIcon("icons/undo.png"), "Undo", self)
-        redo_button = QAction(QIcon("icons/redo.png"), "Redo", self)
+        up_button = QAction(QIcon("icons/arrow-up.png"), "Shift item up", self)
+        down_button = QAction(QIcon("icons/arrow-down.png"), "Shift item down", self)
         help_button = QAction(QIcon("icons/question.png"), "Help", self)
 
         # Action shortcuts
@@ -65,8 +65,8 @@ class MainWindow(QMainWindow):
         cut_tab_button.setShortcut(QKeySequence("Ctrl+w"))
         add_item_button.setShortcut(QKeySequence("Ctrl+a"))
         cut_item_button.setShortcut(QKeySequence("Ctrl+x"))
-        undo_button.setShortcut(QKeySequence("Ctrl+z"))
-        redo_button.setShortcut(QKeySequence("Ctrl+y"))
+        up_button.setShortcut(QKeySequence("Ctrl+z"))
+        down_button.setShortcut(QKeySequence("Ctrl+y"))
         help_button.setShortcut(QKeySequence("Ctrl+h"))
 
         # Toolbar action connects
@@ -74,19 +74,17 @@ class MainWindow(QMainWindow):
         cut_tab_button.triggered.connect(self.cut_tab)
         add_item_button.triggered.connect(self.add_item)
         cut_item_button.triggered.connect(self.cut_item)
-        undo_button.triggered.connect(self.undo)
-        redo_button.triggered.connect(self.redo)
+        up_button.triggered.connect(self.shift_up)
+        down_button.triggered.connect(self.shift_down)
         help_button.triggered.connect(self.show_help_window)
 
         # Add to toolbar
         toolbar.addAction(add_tab_button)
         toolbar.addAction(cut_tab_button)
-        toolbar.addSeparator()
         toolbar.addAction(add_item_button)
         toolbar.addAction(cut_item_button)
-        toolbar.addSeparator()
-        toolbar.addAction(undo_button)
-        toolbar.addAction(redo_button)
+        toolbar.addAction(up_button)
+        toolbar.addAction(down_button)
         toolbar.addAction(help_button)
         toolbar.setMovable(False)
 
@@ -173,11 +171,24 @@ class MainWindow(QMainWindow):
 
                 self.clear_inspector()
 
-    def undo(self):
-        print("Undo")
+    def shift_up(self):
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            i = self.lists[tab_i].currentRow()
+            if i > 0:
+                item = self.lists[tab_i].takeItem(i)
+                self.lists[tab_i].insertItem(i-1, item)
+                self.lists[tab_i].setCurrentRow(i-1)
 
-    def redo(self):
-        print("Redo")
+
+    def shift_down(self):
+        tab_i = self.tabs.currentIndex()
+        if tab_i >= 0:
+            i = self.lists[tab_i].currentRow()
+            if i >= 0 and i+1 < len(self.buckets[tab_i]):
+                item = self.lists[tab_i].takeItem(i)
+                self.lists[tab_i].insertItem(i+1, item)
+                self.lists[tab_i].setCurrentRow(i+1)
 
     def show_help_window(self):
         self.help_window = HelpWindow()
@@ -226,7 +237,7 @@ class MainWindow(QMainWindow):
         else:
             return
         
-        
+
 
 app = QApplication([])
 window = MainWindow()
