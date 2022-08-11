@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from src.helpWindow import HelpWindow
+from src.tabDialog import TabDialog
 from src.bucketList import *
 
 
@@ -215,12 +216,15 @@ class MainWindow(QMainWindow):
                 self.save_button.setEnabled(False)
 
     def edit_tab_name(self):
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Buckets")
-        dialog.setWindowIcon(QIcon("icons/list.png"))
-        dialog.resize(QSize(250, 125))
-
-        dialog.exec()
+        dialog = TabDialog(self)
+        if dialog.exec():
+            if len(new_name := dialog.editor.text()):
+                tab_i = self.tabs.currentIndex()
+                self.tabs.setTabText(tab_i, new_name)
+            else:
+                return
+        else:
+            return
         
         
 
