@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         redo_button.setShortcut(QKeySequence("Ctrl+y"))
         help_button.setShortcut(QKeySequence("Ctrl+h"))
 
-        # Toolbar connects
+        # Toolbar action connects
         add_tab_button.triggered.connect(self.add_tab)
         cut_tab_button.triggered.connect(self.cut_tab)
         add_item_button.triggered.connect(self.add_item)
@@ -78,7 +78,6 @@ class MainWindow(QMainWindow):
         help_button.triggered.connect(self.show_help_window)
 
         # Add to toolbar
-        toolbar.addSeparator()
         toolbar.addAction(add_tab_button)
         toolbar.addAction(cut_tab_button)
         toolbar.addSeparator()
@@ -94,6 +93,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
         self.tabs.currentChanged.connect(self.clear_inspector)
+        self.tabs.tabBarDoubleClicked.connect(self.edit_tab_name)
 
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
@@ -213,6 +213,14 @@ class MainWindow(QMainWindow):
                 self.lastModified.setText(self.buckets[tab_i].items[i].last_modified)
             else:
                 self.save_button.setEnabled(False)
+
+    def edit_tab_name(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Buckets")
+        dialog.setWindowIcon(QIcon("icons/list.png"))
+        dialog.resize(QSize(250, 125))
+
+        dialog.exec()
         
         
 
