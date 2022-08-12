@@ -27,14 +27,14 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
 
         # Setup widgets
+        self.setup_toolbar()
+        self.setup_inspector()
+        self.setup_layout()
         if os.path.exists(path := "data/save.pickle"):
             self.load_saved(path)
         else:
             self.setup_lists()
             self.setup_tabs()
-        self.setup_toolbar()
-        self.setup_inspector()
-        self.setup_layout()
 
         self.MainWidget = QWidget()
         self.MainWidget.setLayout(self.layout)
@@ -99,7 +99,16 @@ class MainWindow(QMainWindow):
         toolbar.setMovable(False)
 
     def load_saved(self, path):
-        saved_buckets = pickle.load(open(path, "rb"))
+        self.buckets = pickle.load(open(path, "rb"))
+        self.tabs.currentChanged.connect(self.clear_inspector)
+        self.tabs.tabBarDoubleClicked.connect(self.edit_tab_name)
+
+        for b in self.buckets:
+            self.lists.append(QListWidget())
+            self.lists[-1].clicked.connect(self.item_clicked)
+            self.tabs.addTab(self.lists[-1], QIcon(""), b.title)
+            for item in b.items:
+                self.lists[-1].addItem(item.title)
         
 
     def setup_inspector(self):
@@ -188,6 +197,9 @@ class MainWindow(QMainWindow):
                 self.lists[tab_i].insertItem(i-1, item)
                 self.lists[tab_i].setCurrentRow(i-1)
 
+                item = self.buckets[tab_i].items.pop(i)
+                self.buckets[tab_i].items.insert(i-1, item)
+
     def shift_down(self):
         tab_i = self.tabs.currentIndex()
         if tab_i >= 0:
@@ -196,6 +208,9 @@ class MainWindow(QMainWindow):
                 item = self.lists[tab_i].takeItem(i)
                 self.lists[tab_i].insertItem(i+1, item)
                 self.lists[tab_i].setCurrentRow(i+1)
+
+                item = self.buckets[tab_i].items.pop(i)
+                self.buckets[tab_i].items.insert(i+1, item)
 
     def show_help_window(self):
         self.help_window = HelpWindow()
@@ -239,6 +254,7 @@ class MainWindow(QMainWindow):
             if len(new_name := dialog.editor.text()):
                 tab_i = self.tabs.currentIndex()
                 self.tabs.setTabText(tab_i, new_name)
+                self.buckets[tab_i].set_title(new_name)
             else:
                 return
         else:

@@ -44,8 +44,13 @@ class BucketList:
     def __init__(self, title):
         self.title = title
         self.date_format = "%B %d %Y, %I:%M %p"
-        self.last_modified = datetime.now().strftime(self.date_format)
         self.items = []
+
+    def set_title(self, title):
+        if len(title) > 100:
+            self.title = title[:100]
+        else:
+            self.title = title
 
     def add_item(self, title):
         item = Item(title)
