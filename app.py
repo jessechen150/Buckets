@@ -1,4 +1,5 @@
 import os
+import pickle
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
@@ -23,11 +24,15 @@ class MainWindow(QMainWindow):
         # self.bucket = BucketList("My Bucket List")
         self.buckets = []
         self.lists = []
+        self.tabs = QTabWidget()
 
         # Setup widgets
-        self.setup_lists()
+        if os.path.exists(path := "data/save.pickle"):
+            self.load_saved(path)
+        else:
+            self.setup_lists()
+            self.setup_tabs()
         self.setup_toolbar()
-        self.setup_tabs()
         self.setup_inspector()
         self.setup_layout()
 
@@ -39,6 +44,11 @@ class MainWindow(QMainWindow):
         self.buckets.append(BucketList("New bucket list"))
         self.lists.append(QListWidget())
         self.lists[-1].clicked.connect(self.item_clicked)
+
+    def setup_tabs(self):
+        self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
+        self.tabs.currentChanged.connect(self.clear_inspector)
+        self.tabs.tabBarDoubleClicked.connect(self.edit_tab_name)
 
     def setup_toolbar(self):
         """
@@ -65,8 +75,8 @@ class MainWindow(QMainWindow):
         cut_tab_button.setShortcut(QKeySequence("Ctrl+w"))
         add_item_button.setShortcut(QKeySequence("Ctrl+a"))
         cut_item_button.setShortcut(QKeySequence("Ctrl+x"))
-        up_button.setShortcut(QKeySequence("Ctrl+z"))
-        down_button.setShortcut(QKeySequence("Ctrl+y"))
+        up_button.setShortcut(QKeySequence("Shift+Up"))
+        down_button.setShortcut(QKeySequence("Shift+Down"))
         help_button.setShortcut(QKeySequence("Ctrl+h"))
 
         # Toolbar action connects
@@ -88,11 +98,10 @@ class MainWindow(QMainWindow):
         toolbar.addAction(help_button)
         toolbar.setMovable(False)
 
-    def setup_tabs(self):
-        self.tabs = QTabWidget()
-        self.tabs.addTab(self.lists[-1], QIcon(""), self.buckets[-1].title)
-        self.tabs.currentChanged.connect(self.clear_inspector)
-        self.tabs.tabBarDoubleClicked.connect(self.edit_tab_name)
+    def load_saved(self, path):
+        saved_buckets = pickle.load(open(path, "rb"))
+        self.setup_lists()
+        self.setup_tabs()
 
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
@@ -180,7 +189,6 @@ class MainWindow(QMainWindow):
                 self.lists[tab_i].insertItem(i-1, item)
                 self.lists[tab_i].setCurrentRow(i-1)
 
-
     def shift_down(self):
         tab_i = self.tabs.currentIndex()
         if tab_i >= 0:
@@ -237,9 +245,12 @@ class MainWindow(QMainWindow):
         else:
             return
         
-
+    def closeEvent(self, event):
+        pickle.dump(self.buckets, open("data/save.pickle", "wb"))
+        event.accept()
 
 app = QApplication([])
+
 window = MainWindow()
 window.show()
 
