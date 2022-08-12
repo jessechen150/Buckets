@@ -100,8 +100,7 @@ class MainWindow(QMainWindow):
 
     def load_saved(self, path):
         saved_buckets = pickle.load(open(path, "rb"))
-        self.setup_lists()
-        self.setup_tabs()
+        
 
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
