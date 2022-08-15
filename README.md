@@ -33,5 +33,6 @@ Some future improvement ideas include:
 
 ## About
 
-Version: 0.1
-Last Updated: August 14th, 2022
+*Version*: 0.1
+
+*Last Updated*: August 14th, 2022
