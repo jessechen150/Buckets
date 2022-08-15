@@ -8,12 +8,8 @@ Its main features include:
 * Move around items for organization.
 * share items easily with a single save file.
 
----
-
 ### How to Use
 
 Clone the repository and run `python app.py`. Make sure your Python version is 3 and you have PyQt as specificied in `requirements.txt`.
-
----
 
 Currently in development.
