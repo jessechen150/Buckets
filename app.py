@@ -62,13 +62,13 @@ class MainWindow(QMainWindow):
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
 
         # Toolbar actions
-        add_tab_button = QAction(QIcon("icons/plus.png"), "Add a new bucket list", self)
-        cut_tab_button = QAction(QIcon("icons/cross.png"), "Remove current bucket list", self)
-        add_item_button = QAction(QIcon("icons/pencil-plus.png"), "Add a new item", self)
-        cut_item_button = QAction(QIcon("icons/scissors.png"), "Remove current item", self)
-        up_button = QAction(QIcon("icons/arrow-up.png"), "Shift item up", self)
-        down_button = QAction(QIcon("icons/arrow-down.png"), "Shift item down", self)
-        help_button = QAction(QIcon("icons/question.png"), "Help", self)
+        add_tab_button = QAction(QIcon("icons/plus.png"), "Add a new bucket list (Ctrl + t)", self)
+        cut_tab_button = QAction(QIcon("icons/cross.png"), "Remove current bucket list (Ctrl + w)", self)
+        add_item_button = QAction(QIcon("icons/pencil-plus.png"), "Add a new item (Ctrl + a)", self)
+        cut_item_button = QAction(QIcon("icons/scissors.png"), "Remove current item (Ctrl + x)", self)
+        up_button = QAction(QIcon("icons/arrow-up.png"), "Shift item up (Shift + Up)", self)
+        down_button = QAction(QIcon("icons/arrow-down.png"), "Shift item down (Shift + Down)", self)
+        help_button = QAction(QIcon("icons/question.png"), "Help (Ctrl + h)", self)
 
         # Action shortcuts
         add_tab_button.setShortcut(QKeySequence("Ctrl+t"))
@@ -110,7 +110,6 @@ class MainWindow(QMainWindow):
             for item in b.items:
                 self.lists[-1].addItem(item.title)
         
-
     def setup_inspector(self):
         self.titleEdit = QLineEdit()
         self.titleEdit.setEnabled(False)
