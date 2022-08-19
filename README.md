@@ -31,7 +31,7 @@ Some future improvement ideas include:
 
 ---
 
-## About
+### About
 
 *Version*: 0.1
 
